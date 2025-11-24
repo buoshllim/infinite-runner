@@ -294,39 +294,39 @@ const UI = () => {
 
       {!isPlaying && !isGameOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity z-50">
-          <div className="text-center p-8 bg-white/10 rounded-3xl border border-white/20 shadow-2xl backdrop-blur-md flex flex-col gap-4 max-w-md w-full">
-            <h2 className="text-5xl font-extrabold text-white mb-2 drop-shadow-lg">Infinite Runner!</h2>
-            <p className="text-green-100 mb-2 text-lg">Choose your journey.</p>
+          <div className="text-center p-6 bg-white/10 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-md flex flex-col gap-3 max-w-sm w-full mx-4">
+            <h2 className="text-3xl font-extrabold text-white mb-1 drop-shadow-lg">Infinite Runner!</h2>
+            <p className="text-green-100 mb-1 text-base">Choose your journey.</p>
             
             <button 
               onClick={() => handleStart('HEALING')}
-              className="px-12 py-4 bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-full text-xl font-bold shadow-lg hover:scale-105 transition-transform active:scale-95"
+              className="px-8 py-3 bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-full text-lg font-bold shadow-lg hover:scale-105 transition-transform active:scale-95"
             >
               Healing Mode
             </button>
 
             <button 
               onClick={() => handleStart('TIME_ATTACK')}
-              className="px-12 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full text-xl font-bold shadow-lg hover:scale-105 transition-transform active:scale-95 mb-2"
+              className="px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full text-lg font-bold shadow-lg hover:scale-105 transition-transform active:scale-95 mb-1"
             >
               Time Attack Mode
             </button>
 
             {/* Power-up Descriptions */}
-            <div className="grid grid-cols-2 gap-4 mt-2 w-full">
-                <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col items-center">
-                    <div className="text-3xl mb-1">🔥</div>
-                    <div className="font-bold text-white text-sm">BOOSTER</div>
-                    <p className="text-[10px] text-white/70 leading-tight mt-1">100 coins for speed-up</p>
+            <div className="grid grid-cols-2 gap-3 mt-1 w-full">
+                <div className="bg-white/5 p-2 rounded-xl border border-white/10 flex flex-col items-center">
+                    <div className="text-2xl mb-1">🔥</div>
+                    <div className="font-bold text-white text-xs">BOOSTER</div>
+                    <p className="text-[10px] text-white/70 leading-tight mt-0.5">100 coins for speed-up</p>
                 </div>
-                <div className="bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col items-center">
-                    <div className="text-3xl mb-1">🧲</div>
-                    <div className="font-bold text-white text-sm">MAGNET</div>
-                    <p className="text-[10px] text-white/70 leading-tight mt-1">150 coins for magnet</p>
+                <div className="bg-white/5 p-2 rounded-xl border border-white/10 flex flex-col items-center">
+                    <div className="text-2xl mb-1">🧲</div>
+                    <div className="font-bold text-white text-xs">MAGNET</div>
+                    <p className="text-[10px] text-white/70 leading-tight mt-0.5">150 coins for magnet</p>
                 </div>
             </div>
 
-            <p className="mt-4 text-xs text-white/60">Drag Button to Steer • Tap Button to Jump</p>
+            <p className="mt-2 text-[10px] text-white/60">Drag Button to Steer • Tap Button to Jump</p>
           </div>
         </div>
       )}
