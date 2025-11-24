@@ -269,7 +269,7 @@ const UI = () => {
 
       <div className="p-6 w-full flex justify-between items-start text-white drop-shadow-md pointer-events-none z-20">
         <div>
-          <h1 className="text-2xl font-bold tracking-wider text-green-100 opacity-80">INFINITE RUNNER</h1>
+          <h1 className="text-xl font-bold tracking-wider text-green-100 opacity-80">INFINITE RUNNER</h1>
           <p className="text-sm opacity-70">Great Nature</p>
           
           {gameMode === 'TIME_ATTACK' && (
@@ -280,7 +280,7 @@ const UI = () => {
         </div>
         
         <div className="flex flex-col items-end">
-            <div className="text-3xl font-mono font-bold">{distanceDisplay}</div>
+            <div className="text-2xl font-mono font-bold">{distanceDisplay}</div>
             <div className="flex items-baseline gap-2 opacity-80 mt-1">
                 <span className="text-xs uppercase">Speed</span>
                 <span className={`text-lg font-bold ${isBoosting ? 'text-red-400 animate-pulse' : ''}`}>{speed.toFixed(0)} km/h</span>
