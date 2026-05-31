@@ -20,7 +20,9 @@ const UI = () => {
   const speed = useGameStore((state) => state.speed);
   const updateSpeed = useGameStore((state) => state.updateSpeed);
   const setRawSpeed = useGameStore((state) => state.setRawSpeed);
-  const setCameraDragOffset = useGameStore((state) => state.setCameraDragOffset);
+  const setCameraOffset = useGameStore((state) => state.setCameraOffset);
+  const resetCameraOffset = useGameStore((state) => state.resetCameraOffset);
+  const cameraOffset = useGameStore((state) => state.cameraOffset);
   const coins = useGameStore((state) => state.coins);
   const addCoins = useGameStore((state) => state.addCoins);
   const lastCoinLoss = useGameStore((state) => state.lastCoinLoss); 
@@ -47,6 +49,12 @@ const UI = () => {
 
   const camDragStart = useRef<{ x: number, y: number } | null>(null);
   const isCamDragging = useRef(false);
+  const camAccum = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
+  const camZoom = useRef<number>(1.0);
+  const activePointers = useRef<Map<number, { x: number, y: number }>>(new Map());
+  const lastPinchDist = useRef<number | null>(null);
+
+  const isDefaultCamera = Math.abs(cameraOffset.x) < 0.05 && Math.abs(cameraOffset.y) < 0.05 && Math.abs(cameraOffset.zoom - 1.0) < 0.1;
 
   const speedIntervalRef = useRef<number | null>(null);
   const pressStartTimeRef = useRef<number>(0);
@@ -173,22 +181,72 @@ const UI = () => {
   };
 
   const handleCamPointerDown = (e: React.PointerEvent) => {
-    camDragStart.current = { x: e.clientX, y: e.clientY };
-    isCamDragging.current = true;
+    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.current.size === 1) {
+      camDragStart.current = { x: e.clientX, y: e.clientY };
+      isCamDragging.current = true;
+      lastPinchDist.current = null;
+    } else if (activePointers.current.size === 2) {
+      isCamDragging.current = false;
+      const pts = Array.from(activePointers.current.values());
+      const dx = pts[0].x - pts[1].x;
+      const dy = pts[0].y - pts[1].y;
+      lastPinchDist.current = Math.sqrt(dx * dx + dy * dy);
+    }
   };
 
   const handleCamPointerMove = (e: React.PointerEvent) => {
-    if (!isCamDragging.current || !camDragStart.current) return;
-    const dx = e.clientX - camDragStart.current.x;
-    const dy = e.clientY - camDragStart.current.y;
-    const sensitivity = 0.005;
-    setCameraDragOffset(dx * sensitivity, Math.max(-0.5, Math.min(1.0, dy * sensitivity)));
+    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.current.size >= 2) {
+      const pts = Array.from(activePointers.current.values());
+      const dx = pts[0].x - pts[1].x;
+      const dy = pts[0].y - pts[1].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (lastPinchDist.current !== null) {
+        const ratio = dist / lastPinchDist.current;
+        camZoom.current = Math.max(0.3, Math.min(3.0, camZoom.current / ratio));
+        setCameraOffset(camAccum.current.x, camAccum.current.y, camZoom.current);
+      }
+      lastPinchDist.current = dist;
+    } else if (activePointers.current.size === 1 && isCamDragging.current && camDragStart.current) {
+      const dx = e.clientX - camDragStart.current.x;
+      const dy = e.clientY - camDragStart.current.y;
+      const sensitivity = 0.005;
+      const newX = camAccum.current.x + dx * sensitivity;
+      const newY = Math.max(-0.5, Math.min(1.0, camAccum.current.y + dy * sensitivity));
+      setCameraOffset(newX, newY, camZoom.current);
+    }
   };
 
-  const handleCamPointerUp = () => {
-    isCamDragging.current = false;
-    camDragStart.current = null;
-    setCameraDragOffset(0, 0);
+  const handleCamPointerUp = (e: React.PointerEvent) => {
+    if (activePointers.current.size === 1 && isCamDragging.current && camDragStart.current) {
+      const dx = e.clientX - camDragStart.current.x;
+      const dy = e.clientY - camDragStart.current.y;
+      const sensitivity = 0.005;
+      camAccum.current.x += dx * sensitivity;
+      camAccum.current.y = Math.max(-0.5, Math.min(1.0, camAccum.current.y + dy * sensitivity));
+    }
+    activePointers.current.delete(e.pointerId);
+    if (activePointers.current.size < 2) lastPinchDist.current = null;
+    if (activePointers.current.size === 0) {
+      isCamDragging.current = false;
+      camDragStart.current = null;
+    } else if (activePointers.current.size === 1) {
+      const [, pos] = Array.from(activePointers.current.entries())[0];
+      camDragStart.current = { x: pos.x, y: pos.y };
+      isCamDragging.current = true;
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    camZoom.current = Math.max(0.3, Math.min(3.0, camZoom.current * (1 + e.deltaY * 0.001)));
+    setCameraOffset(camAccum.current.x, camAccum.current.y, camZoom.current);
+  };
+
+  const handleResetCamera = () => {
+    camAccum.current = { x: 0, y: 0 };
+    camZoom.current = 1.0;
+    resetCameraOffset();
   };
 
   const handleJoystickDown = (e: React.PointerEvent) => {
@@ -259,12 +317,13 @@ const UI = () => {
         )}
       </div>
 
-      <div 
+      <div
         className="absolute inset-0 z-0 touch-none"
         onPointerDown={handleCamPointerDown}
         onPointerMove={handleCamPointerMove}
         onPointerUp={handleCamPointerUp}
         onPointerLeave={handleCamPointerUp}
+        onWheel={handleWheel}
       />
 
       <div className="p-6 w-full flex justify-between items-start text-white drop-shadow-md pointer-events-none z-20">
@@ -353,7 +412,16 @@ const UI = () => {
       <div className="p-8 flex justify-between items-end w-full z-20 pointer-events-none">
         
         <div className={`flex flex-col gap-4 mb-2 ml-4 pointer-events-auto transition-opacity ${isBoosting ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-             <button 
+             {!isDefaultCamera && (
+               <button
+                 onClick={handleResetCamera}
+                 className="w-14 h-14 bg-white/30 backdrop-blur-md rounded-full border border-white/50 flex items-center justify-center shadow-lg active:bg-white/50 transition-colors select-none touch-none"
+                 title="원래 화면으로"
+               >
+                 <span className="text-white text-xl pointer-events-none">⊙</span>
+               </button>
+             )}
+             <button
                 onPointerDown={() => handleSpeedStart(1)}
                 onPointerUp={handleSpeedEnd}
                 onPointerLeave={handleSpeedEnd}

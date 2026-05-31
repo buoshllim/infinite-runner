@@ -124,7 +124,7 @@ export const Player: React.FC = () => {
   const resetJump = useGameStore(state => state.resetJump);
   const targetX = useGameStore(state => state.targetX);
   const speed = useGameStore(state => state.speed);
-  const cameraDragOffset = useGameStore(state => state.cameraDragOffset);
+  const cameraOffset = useGameStore(state => state.cameraOffset);
   const resetTrigger = useGameStore(state => state.resetTrigger);
   const knockbackForceY = useGameStore(state => state.knockbackForceY); 
   const resetKnockback = useGameStore(state => state.resetKnockback);
@@ -298,11 +298,11 @@ export const Player: React.FC = () => {
     if (shakeIntensity.current > 0) { shakeIntensity.current = MathUtils.lerp(shakeIntensity.current, 0, delta * 5); if (shakeIntensity.current < 0.01) shakeIntensity.current = 0; }
     const shakeX = (Math.random() - 0.5) * shakeIntensity.current;
     const shakeY = (Math.random() - 0.5) * shakeIntensity.current;
-    const targetLookX = -cameraDragOffset.x * Math.PI; 
-    const targetLookY = cameraDragOffset.y * Math.PI * 0.3;
+    const targetLookX = -cameraOffset.x * Math.PI;
+    const targetLookY = cameraOffset.y * Math.PI * 0.3;
     currentLookOffset.current.x = MathUtils.lerp(currentLookOffset.current.x, targetLookX, delta * 8);
     currentLookOffset.current.y = MathUtils.lerp(currentLookOffset.current.y, targetLookY, delta * 8);
-    const baseOffset = new Vector3(0, 4.5, -9.5);
+    const baseOffset = new Vector3(0, 4.5, -9.5).multiplyScalar(cameraOffset.zoom);
     baseOffset.applyAxisAngle(new Vector3(1, 0, 0), currentLookOffset.current.y);
     baseOffset.applyAxisAngle(new Vector3(0, 1, 0), currentLookOffset.current.x);
     const camTargetPos = new Vector3(position.current.x * 0.5 + shakeX, smoothedCameraY.current + shakeY, position.current.z).add(baseOffset);

@@ -11,7 +11,7 @@ interface GameState {
   jumpRequest: boolean;
   targetX: number; // -1 to 1 (Left to Right normalized)
   speed: number;
-  cameraDragOffset: { x: number, y: number }; // x: Yaw (left/right), y: Pitch (up/down)
+  cameraOffset: { x: number, y: number, zoom: number }; // x: Yaw, y: Pitch, zoom: 1=default
   
   // Game Modes
   gameMode: GameMode;
@@ -47,7 +47,8 @@ interface GameState {
   setRawSpeed: (speed: number) => void; 
   setBoostState: (isBoosting: boolean, cooldown: boolean) => void; 
   setMagnetState: (isActive: boolean, cooldown: boolean) => void;
-  setCameraDragOffset: (x: number, y: number) => void;
+  setCameraOffset: (x: number, y: number, zoom: number) => void;
+  resetCameraOffset: () => void;
   
   setGameMode: (mode: GameMode) => void;
   setTimeRemaining: (time: number) => void;
@@ -65,7 +66,7 @@ export const useGameStore = create<GameState>((set) => ({
   jumpRequest: false,
   targetX: 0,
   speed: WORLD_CONFIG.SPEED,
-  cameraDragOffset: { x: 0, y: 0 },
+  cameraOffset: { x: 0, y: 0, zoom: 1 },
   
   gameMode: null,
   timeRemaining: 120, 
@@ -109,7 +110,8 @@ export const useGameStore = create<GameState>((set) => ({
   setBoostState: (isBoosting, boostCooldown) => set({ isBoosting, boostCooldown }),
   setMagnetState: (isMagnetActive, magnetCooldown) => set({ isMagnetActive, magnetCooldown }),
 
-  setCameraDragOffset: (x, y) => set({ cameraDragOffset: { x, y } }),
+  setCameraOffset: (x, y, zoom) => set({ cameraOffset: { x, y, zoom } }),
+  resetCameraOffset: () => set({ cameraOffset: { x: 0, y: 0, zoom: 1 } }),
 
   setGameMode: (mode) => set({ gameMode: mode }),
   setTimeRemaining: (time) => set({ timeRemaining: time }),
@@ -124,7 +126,7 @@ export const useGameStore = create<GameState>((set) => ({
       isPlaying: false, 
       targetX: 0, 
       speed: WORLD_CONFIG.SPEED, 
-      cameraDragOffset: { x: 0, y: 0 },
+      cameraOffset: { x: 0, y: 0, zoom: 1 },
       isBoosting: false,
       boostCooldown: false,
       isMagnetActive: false,
