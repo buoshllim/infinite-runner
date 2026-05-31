@@ -418,7 +418,7 @@ const UI = () => {
                  className="w-14 h-14 bg-white/30 backdrop-blur-md rounded-full border border-white/50 flex items-center justify-center shadow-lg active:bg-white/50 transition-colors select-none touch-none"
                  title="원래 화면으로"
                >
-                 <span className="text-white text-xl pointer-events-none">⊙</span>
+                 <span className="text-white text-3xl pointer-events-none">⊙</span>
                </button>
              )}
              <button
