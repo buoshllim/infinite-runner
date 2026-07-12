@@ -48,6 +48,15 @@ const UI = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showEntry, setShowEntry] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [boostCooldownEnd, setBoostCooldownEnd] = useState<number | null>(null);
+  const [magnetCooldownEnd, setMagnetCooldownEnd] = useState<number | null>(null);
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    if (!boostCooldown && !magnetCooldown) return;
+    const interval = setInterval(() => forceUpdate(n => n + 1), 500);
+    return () => clearInterval(interval);
+  }, [boostCooldown, magnetCooldown]);
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -231,9 +240,10 @@ const UI = () => {
     addCoins(-100);
     const preBoostSpeed = useGameStore.getState().speed;
     
-    setBoostState(true, true); 
-    setRawSpeed(200); 
-    audioService.startBoostWind(); 
+    setBoostState(true, true);
+    setBoostCooldownEnd(Date.now() + 20000);
+    setRawSpeed(200);
+    audioService.startBoostWind();
 
     setTimeout(() => {
         if (useGameStore.getState().isPlaying && !useGameStore.getState().isGameOver) {
@@ -252,7 +262,8 @@ const UI = () => {
       if (coins < 150 || magnetCooldown || isMagnetActive || isGameOver) return;
       addCoins(-150);
       setMagnetState(true, true);
-      audioService.startMagnetSound(); // START SOUND
+      setMagnetCooldownEnd(Date.now() + 20000);
+      audioService.startMagnetSound();
       
       setTimeout(() => {
           useGameStore.getState().setMagnetState(false, true);
@@ -672,48 +683,68 @@ const UI = () => {
         <div className="relative mr-4">
             
             {/* MAGNET BUTTON */}
-            <div className="absolute bottom-56 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-                <button
-                    onClick={coins >= 150 ? handleMagnet : undefined}
+            {(() => {
+              const timeLeft = magnetCooldown && magnetCooldownEnd ? Math.max(0, Math.ceil((magnetCooldownEnd - Date.now()) / 1000)) : 0;
+              return (
+                <div className="absolute bottom-56 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                  <button
+                    onClick={coins >= 150 && !magnetCooldown ? handleMagnet : undefined}
                     disabled={magnetCooldown || coins < 150}
                     className={`
-                        w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
-                        flex items-center justify-center
-                        ${coins < 150
-                            ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
-                            : magnetCooldown
-                                ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
-                                : 'bg-gradient-to-tr from-indigo-500 to-purple-400 border-white/50 active:scale-90 hover:scale-110 animate-pulse'}
+                      w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
+                      flex items-center justify-center relative
+                      ${coins < 150
+                        ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
+                        : magnetCooldown
+                          ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
+                          : 'bg-gradient-to-tr from-indigo-500 to-purple-400 border-white/50 active:scale-90 hover:scale-110 animate-pulse'}
                     `}
-                >
+                  >
                     <span className="text-3xl filter drop-shadow-md">🧲</span>
-                </button>
-                {coins < 150 && (
+                    {magnetCooldown && timeLeft > 0 && (
+                      <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg drop-shadow">
+                        {timeLeft}
+                      </span>
+                    )}
+                  </button>
+                  {coins < 150 && !magnetCooldown && (
                     <span className="text-[10px] font-semibold text-[#FFD700]/50">150 ●</span>
-                )}
-            </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* BOOSTER BUTTON */}
-            <div className="absolute bottom-36 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-                <button
-                    onClick={coins >= 100 ? handleBoost : undefined}
+            {(() => {
+              const timeLeft = boostCooldown && boostCooldownEnd ? Math.max(0, Math.ceil((boostCooldownEnd - Date.now()) / 1000)) : 0;
+              return (
+                <div className="absolute bottom-36 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                  <button
+                    onClick={coins >= 100 && !boostCooldown ? handleBoost : undefined}
                     disabled={boostCooldown || coins < 100}
                     className={`
-                        w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
-                        flex items-center justify-center
-                        ${coins < 100
-                            ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
-                            : boostCooldown
-                                ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
-                                : 'bg-gradient-to-tr from-red-600 to-yellow-400 border-white/50 animate-bounce active:scale-90 hover:scale-110'}
+                      w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
+                      flex items-center justify-center relative
+                      ${coins < 100
+                        ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
+                        : boostCooldown
+                          ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
+                          : 'bg-gradient-to-tr from-red-600 to-yellow-400 border-white/50 animate-bounce active:scale-90 hover:scale-110'}
                     `}
-                >
+                  >
                     <span className="text-2xl filter drop-shadow-md">🔥</span>
-                </button>
-                {coins < 100 && (
+                    {boostCooldown && timeLeft > 0 && (
+                      <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg drop-shadow">
+                        {timeLeft}
+                      </span>
+                    )}
+                  </button>
+                  {coins < 100 && !boostCooldown && (
                     <span className="text-[10px] font-semibold text-[#FFD700]/50">100 ●</span>
-                )}
-            </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div
               onPointerDown={handleJoystickDown}
