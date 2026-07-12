@@ -62,7 +62,7 @@ const UI = () => {
     if (isPlaying && !accelHintShown.current) {
       accelHintShown.current = true;
       const show = setTimeout(() => setShowAccelHint(true), 2000);
-      const hide = setTimeout(() => setShowAccelHint(false), 5500);
+      const hide = setTimeout(() => setShowAccelHint(false), 9000);
       return () => { clearTimeout(show); clearTimeout(hide); };
     }
   }, [isPlaying]);
