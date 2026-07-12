@@ -689,7 +689,7 @@ const UI = () => {
                     <span className="text-3xl filter drop-shadow-md">🧲</span>
                 </button>
                 {coins < 150 && (
-                    <span className="text-[10px] text-white/40 font-semibold">150 🪙</span>
+                    <span className="text-[10px] font-semibold text-[#FFD700]/50">150 ●</span>
                 )}
             </div>
 
@@ -711,7 +711,7 @@ const UI = () => {
                     <span className="text-2xl filter drop-shadow-md">🔥</span>
                 </button>
                 {coins < 100 && (
-                    <span className="text-[10px] text-white/40 font-semibold">100 🪙</span>
+                    <span className="text-[10px] font-semibold text-[#FFD700]/50">100 ●</span>
                 )}
             </div>
 
