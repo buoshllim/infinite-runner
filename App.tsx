@@ -437,7 +437,7 @@ const UI = () => {
             <h1 className="animate-fadeInUp text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
             <p className="animate-fadeInUp-delay text-green-300 mt-2 text-lg">Great Nature</p>
           </div>
-          <p className="absolute bottom-20 animate-slow-blink text-white/60 text-sm tracking-[0.3em]">TAP TO BEGIN</p>
+          <p className="absolute bottom-20 animate-slow-blink text-white/60 text-sm tracking-[0.3em]">TAP TO START</p>
         </div>
       )}
 
