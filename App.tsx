@@ -241,6 +241,8 @@ const UI = () => {
     audioService.stopMagnetSound();
     setIsPaused(false);
     setShowExitConfirm(false);
+    setIsPlaying(false);
+    setRawSpeed(0);
     setGameOver(true);
   };
 
