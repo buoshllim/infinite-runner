@@ -457,6 +457,9 @@ const UI = () => {
             <p className="animate-fadeInUp-delay2 mt-16 text-white text-sm font-semibold tracking-[0.3em] animate-slow-blink drop-shadow-lg">
               TAP TO START
             </p>
+            <p className="animate-fadeInUp-delay2 mt-8 text-white/40 text-xs tracking-wide">
+              ♪ Wonders of the Earth — Grand_Project
+            </p>
           </div>
         </div>
       )}
