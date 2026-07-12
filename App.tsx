@@ -672,40 +672,48 @@ const UI = () => {
         <div className="relative mr-4">
             
             {/* MAGNET BUTTON */}
-            {coins >= 150 && (
+            <div className="absolute bottom-56 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
                 <button
-                    onClick={handleMagnet}
-                    disabled={magnetCooldown}
+                    onClick={coins >= 150 ? handleMagnet : undefined}
+                    disabled={magnetCooldown || coins < 150}
                     className={`
-                        absolute bottom-56 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full 
-                        border-2 border-white/50 shadow-xl pointer-events-auto transition-all transform select-none
+                        w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
                         flex items-center justify-center
-                        ${magnetCooldown 
-                            ? 'bg-gray-500/50 grayscale opacity-70 scale-90' 
-                            : 'bg-gradient-to-tr from-indigo-500 to-purple-400 active:scale-90 hover:scale-110 animate-pulse'}
+                        ${coins < 150
+                            ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
+                            : magnetCooldown
+                                ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
+                                : 'bg-gradient-to-tr from-indigo-500 to-purple-400 border-white/50 active:scale-90 hover:scale-110 animate-pulse'}
                     `}
                 >
                     <span className="text-3xl filter drop-shadow-md">🧲</span>
                 </button>
-            )}
+                {coins < 150 && (
+                    <span className="text-[10px] text-white/40 font-semibold">150 🪙</span>
+                )}
+            </div>
 
             {/* BOOSTER BUTTON */}
-            {coins >= 100 && (
+            <div className="absolute bottom-36 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
                 <button
-                    onClick={handleBoost}
-                    disabled={boostCooldown}
+                    onClick={coins >= 100 ? handleBoost : undefined}
+                    disabled={boostCooldown || coins < 100}
                     className={`
-                        absolute bottom-36 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full 
-                        border-2 border-white/50 shadow-xl pointer-events-auto transition-all transform select-none
+                        w-16 h-16 rounded-full border-2 shadow-xl pointer-events-auto transition-all transform select-none
                         flex items-center justify-center
-                        ${boostCooldown 
-                            ? 'bg-gray-500/50 grayscale opacity-70 scale-90' 
-                            : 'bg-gradient-to-tr from-red-600 to-yellow-400 animate-bounce active:scale-90 hover:scale-110'}
+                        ${coins < 100
+                            ? 'bg-white/10 border-white/20 grayscale opacity-40 scale-90'
+                            : boostCooldown
+                                ? 'bg-gray-500/50 border-white/30 grayscale opacity-70 scale-90'
+                                : 'bg-gradient-to-tr from-red-600 to-yellow-400 border-white/50 animate-bounce active:scale-90 hover:scale-110'}
                     `}
                 >
                     <span className="text-2xl filter drop-shadow-md">🔥</span>
                 </button>
-            )}
+                {coins < 100 && (
+                    <span className="text-[10px] text-white/40 font-semibold">100 🪙</span>
+                )}
+            </div>
 
             <div
               onPointerDown={handleJoystickDown}
