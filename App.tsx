@@ -676,6 +676,7 @@ const IntroCameraMove = () => {
   useFrame((_, delta) => {
     if (!isIntro) return;
     camera.position.z += 15 * delta;
+    camera.lookAt(0, camera.position.y - 3, camera.position.z + 30);
   });
   return null;
 };
