@@ -227,6 +227,7 @@ const UI = () => {
     resetGame();
     setGameMode(mode);
     setIsPlaying(true);
+    accelHintShown.current = false;
   };
 
   const handleRestart = () => {
