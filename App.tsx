@@ -46,6 +46,7 @@ const UI = () => {
   const setMagnetState = useGameStore((state) => state.setMagnetState);
 
   const [isMuted, setIsMuted] = useState(false);
+  const [showEntry, setShowEntry] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
@@ -412,10 +413,26 @@ const UI = () => {
         }
       `}</style>
 
+      {showEntry && (
+        <div
+          className="absolute inset-0 z-[500] bg-black flex flex-col items-center justify-center pointer-events-auto"
+          onClick={() => {
+            audioService.init();
+            audioService.startIntroBGM();
+            setIsIntro(true);
+            setShowEntry(false);
+          }}
+        >
+          <h1 className="text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
+          <p className="text-green-300 mt-2 text-lg">Great Nature</p>
+          <p className="absolute bottom-20 text-white/50 text-sm animate-pulse tracking-[0.3em]">TAP ANYWHERE</p>
+        </div>
+      )}
+
       {isIntro && (
         <div
           className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => { audioService.init(); audioService.startIntroBGM(); setIsIntro(false); }}
+          onClick={() => { setIsIntro(false); }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
           <div className="relative text-center flex flex-col items-center">

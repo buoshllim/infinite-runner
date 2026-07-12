@@ -82,7 +82,7 @@ export const useGameStore = create<GameState>((set) => ({
   isMagnetActive: false,
   magnetCooldown: false,
   
-  isIntro: true,
+  isIntro: false,
   setIsIntro: (v) => set({ isIntro: v }),
 
   resetTrigger: 0,
