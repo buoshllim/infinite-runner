@@ -48,6 +48,14 @@ const UI = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showEntry, setShowEntry] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setIsIntro(true);
+      setShowEntry(false);
+    }, 1000);
+    return () => clearTimeout(t);
+  }, []);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const handleToggleMute = () => {
@@ -411,28 +419,30 @@ const UI = () => {
         .animate-slow-blink {
             animation: slow-blink 1.8s ease-in-out infinite;
         }
+        @keyframes entry-sequence {
+            0%   { opacity: 0; }
+            25%  { opacity: 1; }
+            75%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .animate-entry {
+            animation: entry-sequence 1s ease-in-out forwards;
+        }
       `}</style>
 
       {showEntry && (
-        <div
-          className="absolute inset-0 z-[500] bg-black flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => {
-            audioService.init();
-            audioService.startIntroBGM();
-            setIsIntro(true);
-            setShowEntry(false);
-          }}
-        >
-          <h1 className="text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
-          <p className="text-green-300 mt-2 text-lg">Great Nature</p>
-          <p className="absolute bottom-20 text-white/50 text-sm animate-pulse tracking-[0.3em]">TAP ANYWHERE</p>
+        <div className="absolute inset-0 z-[500] bg-black flex flex-col items-center justify-center pointer-events-none">
+          <div className="animate-entry text-center">
+            <h1 className="text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
+            <p className="text-green-300 mt-2 text-lg">Great Nature</p>
+          </div>
         </div>
       )}
 
       {isIntro && (
         <div
           className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => { setIsIntro(false); }}
+          onClick={() => { audioService.init(); audioService.startIntroBGM(); setIsIntro(false); }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
           <div className="relative text-center flex flex-col items-center">
