@@ -49,13 +49,6 @@ const UI = () => {
   const [showEntry, setShowEntry] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setIsIntro(true);
-      setShowEntry(false);
-    }, 1000);
-    return () => clearTimeout(t);
-  }, []);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const handleToggleMute = () => {
@@ -431,18 +424,27 @@ const UI = () => {
       `}</style>
 
       {showEntry && (
-        <div className="absolute inset-0 z-[500] bg-black flex flex-col items-center justify-center pointer-events-none">
-          <div className="animate-entry text-center">
-            <h1 className="text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
-            <p className="text-green-300 mt-2 text-lg">Great Nature</p>
+        <div
+          className="absolute inset-0 z-[500] bg-black flex flex-col items-center justify-center pointer-events-auto cursor-pointer"
+          onClick={() => {
+            audioService.init();
+            audioService.startIntroBGM();
+            setIsIntro(true);
+            setShowEntry(false);
+          }}
+        >
+          <div className="text-center">
+            <h1 className="animate-fadeInUp text-4xl font-extrabold text-white tracking-widest drop-shadow-xl">INFINITE RUNNER</h1>
+            <p className="animate-fadeInUp-delay text-green-300 mt-2 text-lg">Great Nature</p>
           </div>
+          <p className="absolute bottom-20 animate-slow-blink text-white/60 text-sm tracking-[0.3em]">TAP TO BEGIN</p>
         </div>
       )}
 
       {isIntro && (
         <div
           className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => { audioService.init(); audioService.startIntroBGM(); setIsIntro(false); }}
+          onClick={() => { setIsIntro(false); }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
           <div className="relative text-center flex flex-col items-center">
