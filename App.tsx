@@ -714,10 +714,10 @@ const UI = () => {
              </button>
         </div>
 
-        <div className="relative mr-4">
-            
-            {/* POWER-UP BUTTONS — side by side, centered above joystick */}
-            <div className="absolute bottom-36 left-1/2 -translate-x-1/2 flex flex-row items-end gap-4">
+        <div className="flex flex-col items-center gap-4 mr-4">
+
+            {/* POWER-UP BUTTONS — side by side, directly above joystick */}
+            <div className="flex flex-row items-end gap-4">
               {/* BOOSTER BUTTON */}
               {(() => {
                 const timeLeft = boostCooldown && boostCooldownEnd ? Math.max(0, Math.ceil((boostCooldownEnd - Date.now()) / 1000)) : 0;
