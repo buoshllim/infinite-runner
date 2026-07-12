@@ -22,6 +22,16 @@ class AudioService {
   magnetLfo: OscillatorNode | null = null;
   magnetGain: GainNode | null = null;
 
+  bgm: HTMLAudioElement | null = null;
+  private _isMuted = false;
+  private _visibilityListenerAdded = false;
+
+  stepBuffer: AudioBuffer | null = null;
+  landBuffer: AudioBuffer | null = null;
+  crashBuffer: AudioBuffer | null = null;
+
+  get isMuted() { return this._isMuted; }
+
   init() {
     if (!this.ctx) {
       const AudioContextClass = (window.AudioContext || (window as any).webkitAudioContext);
@@ -37,10 +47,78 @@ class AudioService {
       for (let i = 0; i < bufferSize; i++) {
         data[i] = Math.random() * 2 - 1;
       }
+
+      this.bgm = new Audio('/bgm.mp3');
+      this.bgm.loop = true;
+      this.bgm.volume = 0.4;
+      this.bgm.muted = this._isMuted;
+
+      this.loadSfx('/step.mp3').then(b => { if (b) this.stepBuffer = b; });
+      this.loadSfx('/land.mp3').then(b => { if (b) this.landBuffer = b; });
+      this.loadSfx('/crash.mp3').then(b => { if (b) this.crashBuffer = b; });
     }
     if (this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
+
+    if (!this._visibilityListenerAdded) {
+      this._visibilityListenerAdded = true;
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.ctx?.suspend();
+          this.bgm?.pause();
+        } else {
+          this.ctx?.resume();
+          if (!this._isMuted && this.bgm && !this.bgm.ended && this.bgm.currentTime > 0 && this.bgm.paused) {
+            this.bgm.play().catch(() => {});
+          }
+        }
+      });
+    }
+  }
+
+  private async loadSfx(path: string): Promise<AudioBuffer | null> {
+    if (!this.ctx) return null;
+    try {
+      const res = await fetch(path);
+      const arr = await res.arrayBuffer();
+      return await this.ctx.decodeAudioData(arr);
+    } catch {
+      return null;
+    }
+  }
+
+  private playBuffer(buffer: AudioBuffer, volume = 1) {
+    if (!this.ctx || !this.masterGain) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buffer;
+    const gain = this.ctx.createGain();
+    gain.gain.value = volume;
+    src.connect(gain);
+    gain.connect(this.masterGain);
+    src.start();
+  }
+
+  setMuted(muted: boolean) {
+    this._isMuted = muted;
+    if (this.masterGain) {
+      this.masterGain.gain.value = muted ? 0 : 0.3;
+    }
+    if (this.bgm) {
+      this.bgm.muted = muted;
+    }
+  }
+
+  startBGM() {
+    if (!this.bgm) return;
+    this.bgm.currentTime = 0;
+    this.bgm.play().catch(() => {});
+  }
+
+  stopBGM() {
+    if (!this.bgm) return;
+    this.bgm.pause();
+    this.bgm.currentTime = 0;
   }
 
   private playTone(freq: number, type: OscillatorType, duration: number, startTime: number = 0, volume: number = 1) {
@@ -82,11 +160,12 @@ class AudioService {
   }
 
   playLand() {
-    // Low thud
+    if (this.landBuffer) { this.playBuffer(this.landBuffer, 1.2); return; }
     this.playTone(100, 'triangle', 0.1, 0, 0.8);
   }
 
   playCrash() {
+    if (this.crashBuffer) { this.playBuffer(this.crashBuffer, 1.0); return; }
     if (!this.ctx || !this.masterGain) return;
     // Discordant noise-like sound using sawtooth
     const osc = this.ctx.createOscillator();
@@ -174,8 +253,9 @@ class AudioService {
   }
 
   playWoodStep() {
+    if (this.stepBuffer) { this.playBuffer(this.stepBuffer, 0.8); return; }
     if (!this.ctx || !this.masterGain) return;
-    
+
     // Simulate hollow wooden thud
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();

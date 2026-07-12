@@ -42,6 +42,14 @@ const UI = () => {
   const magnetCooldown = useGameStore((state) => state.magnetCooldown);
   const setMagnetState = useGameStore((state) => state.setMagnetState);
 
+  const [isMuted, setIsMuted] = useState(false);
+
+  const handleToggleMute = () => {
+    const next = !isMuted;
+    setIsMuted(next);
+    audioService.setMuted(next);
+  };
+
   const gestureStartX = useRef<number | null>(null);
   const lastX = useRef<number | null>(null);
   const isDragging = useRef(false);
@@ -353,6 +361,13 @@ const UI = () => {
             animation: fast-blink 0.2s linear infinite;
         }
       `}</style>
+
+      <button
+        onClick={handleToggleMute}
+        className="absolute top-[130px] left-4 z-[200] w-10 h-10 flex items-center justify-center text-xl pointer-events-auto select-none bg-black/30 rounded-full backdrop-blur-sm"
+      >
+        {isMuted ? '🔇' : '🔊'}
+      </button>
 
       <div className="absolute top-[140px] right-[24px] z-50 pointer-events-none flex flex-col items-end">
         {lossDisplay && (
