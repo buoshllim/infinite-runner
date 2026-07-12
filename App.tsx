@@ -401,25 +401,32 @@ const UI = () => {
             opacity: 0;
             animation: fadeInUp 1s ease-out 1.2s forwards;
         }
+        @keyframes slow-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.15; }
+        }
+        .animate-slow-blink {
+            animation: slow-blink 1.8s ease-in-out infinite;
+        }
       `}</style>
 
       {isIntro && (
         <div
           className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => setIsIntro(false)}
+          onClick={() => { audioService.init(); audioService.startBGM(); setIsIntro(false); }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
-          <div className="relative text-center">
+          <div className="relative text-center flex flex-col items-center">
             <h1 className="animate-fadeInUp text-5xl font-extrabold text-white drop-shadow-2xl tracking-widest">
               INFINITE RUNNER
             </h1>
             <p className="animate-fadeInUp-delay text-green-200 text-xl mt-3 drop-shadow-lg">
               Great Nature
             </p>
+            <p className="animate-fadeInUp-delay2 mt-16 text-white text-sm font-semibold tracking-[0.3em] animate-slow-blink drop-shadow-lg">
+              TAP TO START
+            </p>
           </div>
-          <p className="animate-fadeInUp-delay2 absolute bottom-24 text-white/80 text-base animate-pulse tracking-widest">
-            탭해서 시작
-          </p>
         </div>
       )}
 
@@ -440,41 +447,41 @@ const UI = () => {
           <div className="bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl flex flex-col gap-3 items-center min-w-[200px]">
             {!showExitConfirm ? (
               <>
-                <h2 className="text-white text-lg font-bold mb-1">일시정지</h2>
+                <h2 className="text-white text-lg font-bold mb-1">PAUSED</h2>
                 <button
                   onClick={handleToggleMute}
                   className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
                 >
-                  {isMuted ? '🔇 음소거 해제' : '🔊 음소거'}
+                  {isMuted ? '🔇 Unmute' : '🔊 Mute'}
                 </button>
                 <button
                   onClick={() => setShowExitConfirm(true)}
                   className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
                 >
-                  🏠 나가기
+                  🏠 Quit
                 </button>
                 <button
                   onClick={handleResume}
                   className="w-full py-3 rounded-xl bg-green-500/70 border border-green-400/50 text-white font-bold hover:bg-green-500/90 transition-colors"
                 >
-                  ▶ 계속하기
+                  ▶ Resume
                 </button>
               </>
             ) : (
               <>
-                <p className="text-white text-center font-semibold">홈으로 나가시겠어요?<br/><span className="text-white/60 text-sm font-normal">진행 상황이 저장되지 않아요</span></p>
+                <p className="text-white text-center font-semibold">Return to home?<br/><span className="text-white/60 text-sm font-normal">Your progress will be lost</span></p>
                 <div className="flex gap-3 w-full mt-1">
                   <button
                     onClick={() => setShowExitConfirm(false)}
                     className="flex-1 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
                   >
-                    아니요
+                    No
                   </button>
                   <button
                     onClick={handleExitToMain}
                     className="flex-1 py-3 rounded-xl bg-red-500/70 border border-red-400/50 text-white font-bold hover:bg-red-500/90 transition-colors"
                   >
-                    네
+                    Yes
                   </button>
                 </div>
               </>
