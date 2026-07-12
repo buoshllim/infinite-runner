@@ -234,6 +234,16 @@ const UI = () => {
     setGameMode(null);
   };
 
+  const handleHealingQuit = () => {
+    audioService.stopBGM();
+    audioService.stopSiren();
+    audioService.stopBoostWind();
+    audioService.stopMagnetSound();
+    setIsPaused(false);
+    setShowExitConfirm(false);
+    setGameOver(true);
+  };
+
   const handleBoost = () => {
     if (coins < 100 || boostCooldown || isBoosting || isGameOver) return;
 
@@ -537,7 +547,7 @@ const UI = () => {
                     No
                   </button>
                   <button
-                    onClick={handleExitToMain}
+                    onClick={gameMode === 'HEALING' ? handleHealingQuit : handleExitToMain}
                     className="flex-1 py-3 rounded-xl bg-red-500/70 border border-red-400/50 text-white font-bold hover:bg-red-500/90 transition-colors"
                   >
                     Yes
