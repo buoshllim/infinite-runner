@@ -199,7 +199,9 @@ const UI = () => {
   };
 
   const handleStart = (mode: GameMode) => {
-    audioService.init(); 
+    audioService.init();
+    audioService.stopIntroBGM();
+    audioService.startBGM();
     resetGame();
     setGameMode(mode);
     setIsPlaying(true);
@@ -413,7 +415,7 @@ const UI = () => {
       {isIntro && (
         <div
           className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
-          onClick={() => { audioService.init(); audioService.startBGM(); setIsIntro(false); }}
+          onClick={() => { audioService.init(); audioService.startIntroBGM(); setIsIntro(false); }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
           <div className="relative text-center flex flex-col items-center">

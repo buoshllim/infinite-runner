@@ -23,6 +23,7 @@ class AudioService {
   magnetGain: GainNode | null = null;
 
   bgm: HTMLAudioElement | null = null;
+  introBgm: HTMLAudioElement | null = null;
   private _isMuted = false;
   private _visibilityListenerAdded = false;
 
@@ -52,6 +53,11 @@ class AudioService {
       this.bgm.loop = true;
       this.bgm.volume = 0.4;
       this.bgm.muted = this._isMuted;
+
+      this.introBgm = new Audio('/intro-bgm.mp3');
+      this.introBgm.loop = true;
+      this.introBgm.volume = 0.5;
+      this.introBgm.muted = this._isMuted;
 
       this.loadSfx('/step.mp3').then(b => { if (b) this.stepBuffer = b; });
       this.loadSfx('/land.mp3').then(b => { if (b) this.landBuffer = b; });
@@ -107,6 +113,9 @@ class AudioService {
     if (this.bgm) {
       this.bgm.muted = muted;
     }
+    if (this.introBgm) {
+      this.introBgm.muted = muted;
+    }
   }
 
   startBGM() {
@@ -119,6 +128,18 @@ class AudioService {
     if (!this.bgm) return;
     this.bgm.pause();
     this.bgm.currentTime = 0;
+  }
+
+  startIntroBGM() {
+    if (!this.introBgm) return;
+    this.introBgm.currentTime = 0;
+    this.introBgm.play().catch(() => {});
+  }
+
+  stopIntroBGM() {
+    if (!this.introBgm) return;
+    this.introBgm.pause();
+    this.introBgm.currentTime = 0;
   }
 
   private playTone(freq: number, type: OscillatorType, duration: number, startTime: number = 0, volume: number = 1) {
