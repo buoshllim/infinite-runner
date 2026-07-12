@@ -34,6 +34,9 @@ const UI = () => {
   const isGameOver = useGameStore((state) => state.isGameOver);
   const setGameOver = useGameStore((state) => state.setGameOver);
   
+  const isIntro = useGameStore((state) => state.isIntro);
+  const setIsIntro = useGameStore((state) => state.setIsIntro);
+
   const isBoosting = useGameStore((state) => state.isBoosting);
   const boostCooldown = useGameStore((state) => state.boostCooldown);
   const setBoostState = useGameStore((state) => state.setBoostState);
@@ -383,7 +386,42 @@ const UI = () => {
         .animate-fast-blink {
             animation: fast-blink 0.2s linear infinite;
         }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 1.2s ease-out forwards;
+        }
+        .animate-fadeInUp-delay {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+        }
+        .animate-fadeInUp-delay2 {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1.2s forwards;
+        }
       `}</style>
+
+      {isIntro && (
+        <div
+          className="absolute inset-0 z-[400] flex flex-col items-center justify-center pointer-events-auto"
+          onClick={() => setIsIntro(false)}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
+          <div className="relative text-center">
+            <h1 className="animate-fadeInUp text-5xl font-extrabold text-white drop-shadow-2xl tracking-widest">
+              INFINITE RUNNER
+            </h1>
+            <p className="animate-fadeInUp-delay text-green-200 text-xl mt-3 drop-shadow-lg">
+              Great Nature
+            </p>
+          </div>
+          <p className="animate-fadeInUp-delay2 absolute bottom-24 text-white/80 text-base animate-pulse tracking-widest">
+            탭해서 시작
+          </p>
+        </div>
+      )}
 
       {isPlaying && !isGameOver && (
         <button
@@ -488,7 +526,7 @@ const UI = () => {
         </div>
       </div>
 
-      {!isPlaying && !isGameOver && (
+      {!isPlaying && !isGameOver && !isIntro && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity z-50">
           <div className="text-center p-6 bg-white/10 rounded-2xl border border-white/20 shadow-2xl backdrop-blur-md flex flex-col gap-3 max-w-sm w-full mx-4">
             <h2 className="text-3xl font-extrabold text-white mb-1 drop-shadow-lg">Infinite Runner!</h2>
@@ -630,6 +668,16 @@ const UI = () => {
       )}
     </div>
   );
+};
+
+const IntroCameraMove = () => {
+  const isIntro = useGameStore((state) => state.isIntro);
+  const { camera } = useThree();
+  useFrame((_, delta) => {
+    if (!isIntro) return;
+    camera.position.z += 15 * delta;
+  });
+  return null;
 };
 
 const FollowingClouds = () => {
@@ -784,6 +832,7 @@ const DayNightCycle = () => {
 
 const Scene = () => (
     <>
+      <IntroCameraMove />
       <FollowingClouds />
       <DayNightCycle />
       <Player />

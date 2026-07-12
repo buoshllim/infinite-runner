@@ -26,6 +26,10 @@ interface GameState {
   isMagnetActive: boolean;
   magnetCooldown: boolean;
   
+  // Intro
+  isIntro: boolean;
+  setIsIntro: (v: boolean) => void;
+
   // Reset Signal
   resetTrigger: number;
 
@@ -78,6 +82,9 @@ export const useGameStore = create<GameState>((set) => ({
   isMagnetActive: false,
   magnetCooldown: false,
   
+  isIntro: true,
+  setIsIntro: (v) => set({ isIntro: v }),
+
   resetTrigger: 0,
 
   lastCoinLoss: null,
