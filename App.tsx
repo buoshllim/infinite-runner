@@ -58,7 +58,18 @@ const UI = () => {
     return () => clearInterval(interval);
   }, [boostCooldown, magnetCooldown]);
 
+  useEffect(() => {
+    if (isPlaying && !accelHintShown.current) {
+      accelHintShown.current = true;
+      const show = setTimeout(() => setShowAccelHint(true), 2000);
+      const hide = setTimeout(() => setShowAccelHint(false), 5500);
+      return () => { clearTimeout(show); clearTimeout(hide); };
+    }
+  }, [isPlaying]);
+
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showAccelHint, setShowAccelHint] = useState(false);
+  const accelHintShown = useRef(false);
 
   const handleToggleMute = () => {
     const next = !isMuted;
@@ -674,14 +685,24 @@ const UI = () => {
                  <span className="text-white text-3xl pointer-events-none">⊙</span>
                </button>
              )}
-             <button
-                onPointerDown={() => handleSpeedStart(1)}
-                onPointerUp={handleSpeedEnd}
-                onPointerLeave={handleSpeedEnd}
-                className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full border border-white/40 flex items-center justify-center active:bg-white/40 transition-colors shadow-lg select-none touch-none"
-             >
-                <span className="text-white font-bold text-2xl pointer-events-none">▲</span>
-             </button>
+             <div className="relative">
+               <button
+                  onPointerDown={() => handleSpeedStart(1)}
+                  onPointerUp={handleSpeedEnd}
+                  onPointerLeave={handleSpeedEnd}
+                  className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-full border border-white/40 flex items-center justify-center active:bg-white/40 transition-colors shadow-lg select-none touch-none"
+               >
+                  <span className="text-white font-bold text-2xl pointer-events-none">▲</span>
+               </button>
+               {showAccelHint && (
+                 <div className="absolute left-16 top-1/2 -translate-y-1/2 pointer-events-none animate-fadeInUp">
+                   <div className="relative bg-white/90 text-black text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                     Hold to accelerate
+                     <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-white/90" />
+                   </div>
+                 </div>
+               )}
+             </div>
              <button 
                 onPointerDown={() => handleSpeedStart(-1)}
                 onPointerUp={handleSpeedEnd}
