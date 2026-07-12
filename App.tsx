@@ -390,7 +390,7 @@ const UI = () => {
           onClick={handlePause}
           className="absolute top-[130px] left-4 z-[200] w-10 h-10 flex items-center justify-center text-xl pointer-events-auto select-none bg-black/30 rounded-full backdrop-blur-sm"
         >
-          ⏸
+          {'⏸︎'}
         </button>
       )}
 
