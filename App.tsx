@@ -412,6 +412,14 @@ const UI = () => {
         .animate-slow-blink {
             animation: slow-blink 1.8s ease-in-out infinite;
         }
+        @keyframes eq1 { 0%,100%{height:3px} 50%{height:12px} }
+        @keyframes eq2 { 0%,100%{height:8px} 50%{height:3px} }
+        @keyframes eq3 { 0%,100%{height:5px} 50%{height:14px} }
+        @keyframes eq4 { 0%,100%{height:11px} 50%{height:4px} }
+        .eq-bar-1{animation:eq1 0.8s ease-in-out infinite}
+        .eq-bar-2{animation:eq2 0.6s ease-in-out infinite}
+        .eq-bar-3{animation:eq3 0.9s ease-in-out infinite}
+        .eq-bar-4{animation:eq4 0.7s ease-in-out infinite}
         @keyframes entry-sequence {
             0%   { opacity: 0; }
             25%  { opacity: 1; }
@@ -457,9 +465,15 @@ const UI = () => {
             <p className="animate-fadeInUp-delay2 mt-16 text-white text-sm font-semibold tracking-[0.3em] animate-slow-blink drop-shadow-lg">
               TAP TO START
             </p>
-            <p className="animate-fadeInUp-delay2 mt-8 text-white/40 text-xs tracking-wide">
-              ♪ Wonders of the Earth — Grand_Project
-            </p>
+            <div className="animate-fadeInUp-delay2 mt-8 flex items-center gap-2 text-white/40 text-xs tracking-wide">
+              <div className="flex items-end gap-[2px] h-4">
+                <div className="eq-bar-1 w-[3px] bg-white/40 rounded-sm" style={{height:'3px'}} />
+                <div className="eq-bar-2 w-[3px] bg-white/40 rounded-sm" style={{height:'8px'}} />
+                <div className="eq-bar-3 w-[3px] bg-white/40 rounded-sm" style={{height:'5px'}} />
+                <div className="eq-bar-4 w-[3px] bg-white/40 rounded-sm" style={{height:'11px'}} />
+              </div>
+              <span>Wonders of the Earth — Grand_Project</span>
+            </div>
           </div>
         </div>
       )}
