@@ -43,11 +43,23 @@ const UI = () => {
   const setMagnetState = useGameStore((state) => state.setMagnetState);
 
   const [isMuted, setIsMuted] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const handleToggleMute = () => {
     const next = !isMuted;
     setIsMuted(next);
     audioService.setMuted(next);
+  };
+
+  const handlePause = () => {
+    setIsPaused(true);
+    setShowExitConfirm(false);
+  };
+
+  const handleResume = () => {
+    setIsPaused(false);
+    setShowExitConfirm(false);
   };
 
   const gestureStartX = useRef<number | null>(null);
@@ -124,7 +136,7 @@ const UI = () => {
   }, [lastCoinLoss]);
 
   useEffect(() => {
-    if (isPlaying && gameMode === 'TIME_ATTACK' && !isGameOver) {
+    if (isPlaying && gameMode === 'TIME_ATTACK' && !isGameOver && !isPaused) {
       const startTime = Date.now();
       const initialRemaining = timeRemaining;
       
@@ -154,7 +166,7 @@ const UI = () => {
           audioService.stopSiren();
       }
     }
-  }, [isPlaying, gameMode, isGameOver]);
+  }, [isPlaying, gameMode, isGameOver, isPaused]);
 
   const handleSpeedStart = (direction: 1 | -1) => {
     if (isBoosting || isGameOver) return;
@@ -192,8 +204,19 @@ const UI = () => {
 
   const handleRestart = () => {
       resetGame();
-      setGameMode(null); 
+      setGameMode(null);
   }
+
+  const handleExitToMain = () => {
+    audioService.stopBGM();
+    audioService.stopSiren();
+    audioService.stopBoostWind();
+    audioService.stopMagnetSound();
+    setIsPaused(false);
+    setShowExitConfirm(false);
+    resetGame();
+    setGameMode(null);
+  };
 
   const handleBoost = () => {
     if (coins < 100 || boostCooldown || isBoosting || isGameOver) return;
@@ -362,12 +385,62 @@ const UI = () => {
         }
       `}</style>
 
-      <button
-        onClick={handleToggleMute}
-        className="absolute top-[130px] left-4 z-[200] w-10 h-10 flex items-center justify-center text-xl pointer-events-auto select-none bg-black/30 rounded-full backdrop-blur-sm"
-      >
-        {isMuted ? '🔇' : '🔊'}
-      </button>
+      {isPlaying && !isGameOver && (
+        <button
+          onClick={handlePause}
+          className="absolute top-[130px] left-4 z-[200] w-10 h-10 flex items-center justify-center text-xl pointer-events-auto select-none bg-black/30 rounded-full backdrop-blur-sm"
+        >
+          ⏸
+        </button>
+      )}
+
+      {isPaused && isPlaying && !isGameOver && (
+        <div className="absolute inset-0 z-[300] flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-auto">
+          <div className="bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl flex flex-col gap-3 items-center min-w-[200px]">
+            {!showExitConfirm ? (
+              <>
+                <h2 className="text-white text-lg font-bold mb-1">일시정지</h2>
+                <button
+                  onClick={handleToggleMute}
+                  className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
+                >
+                  {isMuted ? '🔇 음소거 해제' : '🔊 음소거'}
+                </button>
+                <button
+                  onClick={() => setShowExitConfirm(true)}
+                  className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
+                >
+                  🏠 나가기
+                </button>
+                <button
+                  onClick={handleResume}
+                  className="w-full py-3 rounded-xl bg-green-500/70 border border-green-400/50 text-white font-bold hover:bg-green-500/90 transition-colors"
+                >
+                  ▶ 계속하기
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-white text-center font-semibold">홈으로 나가시겠어요?<br/><span className="text-white/60 text-sm font-normal">진행 상황이 저장되지 않아요</span></p>
+                <div className="flex gap-3 w-full mt-1">
+                  <button
+                    onClick={() => setShowExitConfirm(false)}
+                    className="flex-1 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors"
+                  >
+                    아니요
+                  </button>
+                  <button
+                    onClick={handleExitToMain}
+                    className="flex-1 py-3 rounded-xl bg-red-500/70 border border-red-400/50 text-white font-bold hover:bg-red-500/90 transition-colors"
+                  >
+                    네
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="absolute top-[140px] right-[24px] z-50 pointer-events-none flex flex-col items-end">
         {lossDisplay && (
